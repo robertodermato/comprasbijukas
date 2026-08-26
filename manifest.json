@@ -1,0 +1,15 @@
+{
+  "name": "Bijukas in Florida",
+  "short_name": "Bijukas",
+  "description": "Bijukas in Florida: calcule na hora quanto a compra custa em reais — desconto por item, sales tax, câmbio, IOF e spread.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F2F4F1",
+  "theme_color": "#186A4B",
+  "icons": [
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

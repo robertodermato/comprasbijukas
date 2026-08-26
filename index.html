@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bijukas in Florida — preço final em reais</title>
+<meta name="description" content="Bijukas in Florida: calcule na hora quanto a compra custa em reais — desconto por item, sales tax, câmbio, IOF e spread.">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#F2F4F1">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#101714">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Bijukas">
+<style>
+:root{
+  --bg:#F2F4F1;
+  --card:#FFFFFF;
+  --ink:#1C2A22;
+  --muted:#5D6E64;
+  --accent:#186A4B;
+  --accent-ink:#14573E;
+  --accent-soft:#E3EFE8;
+  --line:#E1E5DF;
+  --danger:#9C4221;
+  --shadow:0 1px 2px rgba(28,42,34,.05),0 4px 14px rgba(28,42,34,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#101714;
+    --card:#182019;
+    --ink:#E9EFEA;
+    --muted:#93A79B;
+    --accent:#57C393;
+    --accent-ink:#8ADBB4;
+    --accent-soft:#1E2E26;
+    --line:#263129;
+    --danger:#E8926C;
+    --shadow:none;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  background:var(--bg);color:var(--ink);
+  padding:calc(env(safe-area-inset-top, 0px) + 18px) 16px calc(env(safe-area-inset-bottom, 0px) + 28px);
+  -webkit-tap-highlight-color:transparent;
+}
+.app{max-width:460px;margin:0 auto}
+
+/* ---------- header ---------- */
+header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:18px}
+h1{font-size:15px;font-weight:650;letter-spacing:.02em}
+h1 small{display:block;font-size:10.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:2px}
+#btnConfig{
+  border:1px solid var(--line);background:var(--card);color:var(--muted);
+  font:inherit;font-size:12px;font-weight:600;padding:7px 12px;border-radius:99px;cursor:pointer;
+}
+#btnConfig[aria-expanded="true"]{background:var(--accent-soft);color:var(--accent-ink);border-color:transparent}
+
+/* ---------- price + item name ---------- */
+.field-label{font-size:11px;font-weight:650;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:8px}
+.price-wrap{position:relative;margin-bottom:8px}
+.price-wrap .cur{position:absolute;left:18px;top:50%;transform:translateY(-50%);font-size:22px;font-weight:600;color:var(--muted)}
+#price{
+  width:100%;border:1.5px solid var(--line);border-radius:16px;background:var(--card);color:var(--ink);
+  font:inherit;font-size:34px;font-weight:700;font-variant-numeric:tabular-nums;
+  padding:16px 54px 16px 56px;box-shadow:var(--shadow);
+}
+#price:focus{outline:none;border-color:var(--accent)}
+#price::placeholder{color:var(--line);font-weight:600}
+#btnClear{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  width:34px;height:34px;border-radius:50%;border:none;background:transparent;color:var(--muted);
+  font-size:20px;line-height:1;cursor:pointer;display:none;
+}
+.price-wrap.has-value #btnClear{display:block}
+.name-wrap{margin-bottom:14px}
+#itemName{
+  width:100%;border:1.5px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);
+  font:inherit;font-size:14px;font-weight:500;padding:11px 14px;
+}
+#itemName:focus{outline:none;border-color:var(--accent)}
+#itemName::placeholder{color:var(--muted);opacity:.65}
+
+/* ---------- payment mode ---------- */
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px;margin-bottom:12px}
+.seg button{
+  border:none;background:transparent;color:var(--muted);font:inherit;font-size:13.5px;font-weight:600;
+  padding:10px 6px;border-radius:10px;cursor:pointer;
+}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff}
+@media (prefers-color-scheme: dark){.seg button[aria-pressed="true"]{color:#0B241A}}
+
+/* ---------- chips ---------- */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.chips button{
+  border:1px solid var(--line);background:var(--card);color:var(--muted);
+  font:inherit;font-size:12px;font-weight:600;font-variant-numeric:tabular-nums;
+  padding:6px 11px;border-radius:99px;cursor:pointer;
+}
+.chips button.warn{border-color:var(--danger);color:var(--danger)}
+
+/* ---------- receipt (item atual + compra) ---------- */
+.receipt{
+  background:var(--card);border:1px solid var(--line);border-radius:18px;
+  padding:20px 20px 16px;box-shadow:var(--shadow);
+}
+.receipt .total-label{font-size:11px;font-weight:650;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+#total{
+  font-size:clamp(40px,13vw,54px);font-weight:750;letter-spacing:-.02em;
+  font-variant-numeric:tabular-nums;color:var(--accent-ink);
+  margin:4px 0 2px;cursor:pointer;transition:opacity .12s ease;
+}
+#total.dim{opacity:.4;font-size:17px;font-weight:600;color:var(--muted);cursor:default;margin:10px 0}
+.usd-note{font-size:19px;font-weight:650;color:var(--ink);font-variant-numeric:tabular-nums;min-height:1.3em;margin-bottom:2px}
+.usd-note small{font-size:12.5px;font-weight:500;color:var(--muted)}
+.tear{border:none;border-top:1.5px dashed var(--line);margin:16px 0 12px}
+.rows{width:100%;border-collapse:collapse}
+.rows td{font-size:13.5px;padding:4.5px 0;font-variant-numeric:tabular-nums}
+.rows td:last-child{text-align:right;font-weight:600}
+.rows td:first-child{color:var(--muted)}
+.rows tr.sub td{border-top:1px solid var(--line);padding-top:8px;font-weight:650;color:var(--ink)}
+.rows tr.neg td:last-child{color:var(--accent)}
+#btnAdd{
+  display:none;width:100%;margin-top:14px;border:none;border-radius:12px;
+  background:var(--accent);color:#fff;font:inherit;font-size:15px;font-weight:650;
+  padding:13px;cursor:pointer;
+}
+@media (prefers-color-scheme: dark){#btnAdd{color:#0B241A}}
+
+/* ---------- compra ---------- */
+#purchase{margin-top:16px}
+.p-head{display:flex;justify-content:space-between;align-items:baseline}
+.count{font-size:12px;color:var(--muted);font-weight:600}
+#pTotal{
+  font-size:30px;font-weight:750;letter-spacing:-.01em;color:var(--accent-ink);
+  font-variant-numeric:tabular-nums;margin:4px 0 2px;
+}
+#pTotal.p-dim{font-size:15px;color:var(--muted);font-weight:600;margin:8px 0 4px}
+.item{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:none}
+.item-info{flex:1;min-width:0}
+.item-name{font-size:14px;font-weight:600;overflow-wrap:anywhere}
+.item-sub{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums;margin-top:2px}
+.item-net{font-size:14px;font-weight:650;font-variant-numeric:tabular-nums;white-space:nowrap;padding-top:1px}
+.item-x{
+  width:26px;height:26px;border-radius:50%;border:none;background:var(--bg);color:var(--muted);
+  font-size:16px;line-height:1;cursor:pointer;flex:none;
+}
+#btnNew{
+  width:100%;margin-top:14px;border:1.5px solid var(--line);border-radius:12px;background:transparent;
+  color:var(--muted);font:inherit;font-size:13.5px;font-weight:650;padding:11px;cursor:pointer;
+}
+#btnNew.arm{border-color:var(--danger);color:var(--danger)}
+
+/* ---------- config ---------- */
+#config{display:none;margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:var(--shadow)}
+#config.open{display:block}
+#config h2{font-size:11px;font-weight:650;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+.cfg-row{margin-bottom:16px}
+.cfg-row label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+.cfg-row .hint{font-size:11.5px;color:var(--muted);margin-top:5px;line-height:1.45}
+.cfg-row input{
+  width:100%;border:1.5px solid var(--line);border-radius:11px;background:var(--bg);color:var(--ink);
+  font:inherit;font-size:17px;font-weight:600;font-variant-numeric:tabular-nums;padding:11px 13px;
+}
+.cfg-row input:focus{outline:none;border-color:var(--accent)}
+.rate-line{display:grid;grid-template-columns:1fr auto;gap:8px}
+#btnRate{
+  border:none;border-radius:11px;background:var(--accent);color:#fff;
+  font:inherit;font-size:13.5px;font-weight:650;padding:0 16px;cursor:pointer;white-space:nowrap;
+}
+#btnRate:disabled{opacity:.55}
+@media (prefers-color-scheme: dark){#btnRate{color:#0B241A}}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cfg-sep{border:none;border-top:1px solid var(--line);margin:4px 0 16px}
+.cfg-group-label{font-size:10.5px;font-weight:650;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:12px}
+#btnReset{border:none;background:transparent;color:var(--muted);font:inherit;font-size:12.5px;font-weight:600;text-decoration:underline;cursor:pointer;padding:4px 0}
+
+footer{margin-top:22px;text-align:center;font-size:11.5px;color:var(--muted)}
+
+/* ---------- toast ---------- */
+#toast{
+  position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 24px);transform:translateX(-50%) translateY(12px);
+  background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;
+  padding:10px 18px;border-radius:99px;opacity:0;pointer-events:none;transition:opacity .18s ease,transform .18s ease;
+  max-width:88vw;text-align:center;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media (prefers-reduced-motion: reduce){*{transition:none !important}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <h1><small>Bijukas in Florida</small>Preço final em reais</h1>
+    <button id="btnConfig" aria-expanded="false" aria-controls="config">Configurações</button>
+  </header>
+
+  <label class="field-label" for="price">Preço na etiqueta</label>
+  <div class="price-wrap" id="priceWrap">
+    <span class="cur">$</span>
+    <input id="price" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00" aria-label="Preço na etiqueta em dólares">
+    <button id="btnClear" aria-label="Limpar preço">&times;</button>
+  </div>
+  <div class="name-wrap">
+    <input id="itemName" type="text" autocomplete="off" maxlength="60" placeholder="Nome do item (opcional)" aria-label="Nome do item (opcional)">
+  </div>
+
+  <div class="seg" role="group" aria-label="Forma de pagamento">
+    <button id="modeCard" aria-pressed="true">Cartão brasileiro</button>
+    <button id="modeCash" aria-pressed="false">Dinheiro / conta US$</button>
+  </div>
+
+  <div class="chips" id="chips" aria-label="Resumo das configurações"></div>
+
+  <section class="receipt" aria-label="Item atual">
+    <span class="total-label">Total em reais</span>
+    <div id="total" class="dim" role="status" aria-live="polite">Digite o preço para calcular</div>
+    <div class="usd-note" id="usdNote"></div>
+    <hr class="tear">
+    <table class="rows"><tbody id="rows"></tbody></table>
+    <button id="btnAdd">+ Adicionar à compra</button>
+  </section>
+
+  <section class="receipt" id="purchase" aria-label="Compra" hidden>
+    <div class="p-head">
+      <span class="total-label">Total da compra</span>
+      <span class="count" id="pCount"></span>
+    </div>
+    <div id="pTotal"></div>
+    <div class="usd-note" id="pUsd"></div>
+    <hr class="tear">
+    <div id="pItems" aria-label="Itens da compra"></div>
+    <hr class="tear">
+    <table class="rows"><tbody id="pRows"></tbody></table>
+    <button id="btnNew">Nova compra</button>
+  </section>
+
+  <section id="config" aria-label="Configurações">
+    <h2>Configurações</h2>
+
+    <div class="cfg-row">
+      <label for="rate">Cotação do dólar (R$ por US$)</label>
+      <div class="rate-line">
+        <input id="rate" type="text" inputmode="decimal" autocomplete="off" placeholder="5,45">
+        <button id="btnRate">Buscar agora</button>
+      </div>
+      <div class="hint" id="rateHint">No cartão, use a cotação do dia — IOF e spread entram abaixo. Em dinheiro, use o valor que você pagou por dólar.</div>
+    </div>
+
+    <div class="two">
+      <div class="cfg-row">
+        <label for="d1">Desconto da loja (%)</label>
+        <input id="d1" type="text" inputmode="decimal" autocomplete="off" placeholder="0">
+      </div>
+      <div class="cfg-row">
+        <label for="d2">Desconto extra (%)</label>
+        <input id="d2" type="text" inputmode="decimal" autocomplete="off" placeholder="0">
+      </div>
+    </div>
+    <div class="cfg-row" style="margin-top:-8px">
+      <div class="hint">Outlets costumam anunciar “50% + extra 20%”: os dois são aplicados em sequência, não somados. Ao adicionar um item à compra, o desconto do momento fica gravado nele.</div>
+    </div>
+
+    <div class="cfg-row">
+      <label for="tax">Sales tax (%)</label>
+      <input id="tax" type="text" inputmode="decimal" autocomplete="off" placeholder="6,5">
+      <div class="hint">O preço da etiqueta não inclui imposto. Orlando (Orange County): 6,5 · Miami‑Dade: 7.</div>
+    </div>
+
+    <hr class="cfg-sep">
+    <div id="cardGroup">
+      <div class="cfg-group-label">Só no cartão brasileiro</div>
+      <div class="two">
+        <div class="cfg-row">
+          <label for="iof">IOF (%)</label>
+          <input id="iof" type="text" inputmode="decimal" autocomplete="off" placeholder="3,5">
+        </div>
+        <div class="cfg-row">
+          <label for="spread">Spread do banco (%)</label>
+          <input id="spread" type="text" inputmode="decimal" autocomplete="off" placeholder="0">
+        </div>
+      </div>
+      <div class="cfg-row" style="margin-top:-8px">
+        <div class="hint">IOF de compras internacionais em 2026: 3,5%. O spread varia por banco (muitos cobram de 4 a 6) — confira a tarifa do seu cartão. Cartões com “IOF zero” ou conta em dólar: deixe em 0.</div>
+      </div>
+    </div>
+
+    <button id="btnReset">Restaurar padrões</button>
+  </section>
+
+  <footer>Cotação comercial: AwesomeAPI · funciona offline depois do primeiro acesso · v2</footer>
+</div>
+
+<div id="toast" role="status"></div>
+
+<script>
+(function(){
+"use strict";
+
+var KEY="calc-florida-v1";
+var mem={};
+var store={
+  load:function(){try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return mem}},
+  save:function(o){mem=o;try{localStorage.setItem(KEY,JSON.stringify(o))}catch(e){}}
+};
+
+var els={};
+["price","btnClear","priceWrap","itemName","modeCard","modeCash","chips","total","usdNote","rows",
+ "btnAdd","purchase","pCount","pTotal","pUsd","pItems","pRows","btnNew",
+ "config","btnConfig","rate","btnRate","rateHint","d1","d2","tax","iof","spread","cardGroup",
+ "btnReset","toast"].forEach(function(id){els[id]=document.getElementById(id)});
+
+var DEFAULTS={rate:"",d1:"",d2:"",tax:"6,5",iof:"3,5",spread:""};
+
+var saved=store.load();
+var state={
+  mode:saved.mode==="cash"?"cash":"card",
+  seq:(typeof saved.seq==="number"&&saved.seq>0)?Math.floor(saved.seq):1,
+  items:[]
+};
+if(Array.isArray(saved.items)){
+  saved.items.forEach(function(it){
+    var p=+((it||{}).price);
+    if(isFinite(p)&&p>0){
+      state.items.push({
+        name:String(it.name||"Item").slice(0,60),
+        price:p,
+        d1:Math.min(Math.max(+it.d1||0,0),100),
+        d2:Math.min(Math.max(+it.d2||0,0),100)
+      });
+    }
+  });
+}
+
+var fmtBRL=new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"});
+var fmtUSD=new Intl.NumberFormat("en-US",{style:"currency",currency:"USD"});
+
+function num(v){
+  if(typeof v!=="string")return NaN;
+  v=v.trim();
+  if(!v)return NaN;
+  if(v.indexOf(",")>=0)v=v.replace(/\./g,"").replace(",",".");
+  var n=parseFloat(v);
+  return isFinite(n)?n:NaN;
+}
+function pct(v,max){var n=num(v);if(!isFinite(n)||n<0)return 0;return max&&n>max?max:n}
+function rateStr(n){return n.toFixed(4).replace(/0+$/,"").replace(/\.$/,"").replace(".",",")}
+function fm(n){return String(Math.round(n*100)/100).replace(".",",")}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function netOf(it){return it.price*(1-it.d1/100)*(1-it.d2/100)}
+
+var toastT;
+function toast(msg){
+  els.toast.textContent=msg;
+  els.toast.classList.add("show");
+  clearTimeout(toastT);
+  toastT=setTimeout(function(){els.toast.classList.remove("show")},2000);
+}
+
+function persist(){
+  store.save({rate:els.rate.value,d1:els.d1.value,d2:els.d2.value,tax:els.tax.value,
+              iof:els.iof.value,spread:els.spread.value,mode:state.mode,
+              items:state.items,seq:state.seq});
+}
+
+function openConfig(open){
+  els.config.classList.toggle("open",open);
+  els.btnConfig.setAttribute("aria-expanded",open?"true":"false");
+}
+
+function row(label,value,cls){
+  return "<tr"+(cls?' class="'+cls+'"':"")+"><td>"+label+"</td><td>"+value+"</td></tr>";
+}
+function usdStrong(el,usd,tax){
+  el.innerHTML=esc(fmtUSD.format(usd))+" <small>"+(tax>0?"com imposto":"em dólares")+"</small>";
+}
+
+function render(){
+  var isCard=state.mode==="card";
+  els.modeCard.setAttribute("aria-pressed",isCard?"true":"false");
+  els.modeCash.setAttribute("aria-pressed",isCard?"false":"true");
+  els.cardGroup.style.display=isCard?"":"none";
+  els.priceWrap.classList.toggle("has-value",els.price.value.trim()!=="");
+
+  var p=num(els.price.value);
+  var r=num(els.rate.value);
+  var rateOk=isFinite(r)&&r>0;
+  var d1=pct(els.d1.value,100), d2=pct(els.d2.value,100);
+  var tax=pct(els.tax.value), iof=isCard?pct(els.iof.value):0, spr=isCard?pct(els.spread.value):0;
+  var fee=iof+spr;
+
+  /* chips */
+  var chips="";
+  if(rateOk){chips+='<button data-goto="rate">Câmbio '+rateStr(r)+"</button>"}
+  else{chips+='<button data-goto="rate" class="warn">Definir câmbio</button>'}
+  if(d1>0||d2>0){
+    var dtxt="Desc. "+(d1>0?fm(d1)+"%":"");
+    if(d2>0)dtxt+=(d1>0?" + ":"")+fm(d2)+"% extra";
+    chips+='<button data-goto="d1">'+dtxt+"</button>";
+  }
+  if(tax>0)chips+='<button data-goto="tax">Tax '+fm(tax)+"%</button>";
+  if(isCard&&fee>0)chips+='<button data-goto="iof">IOF+spread '+fm(fee)+"%</button>";
+  els.chips.innerHTML=chips;
+
+  /* item atual */
+  if(!isFinite(p)||p<=0){
+    els.total.className="dim";
+    els.total.textContent="Digite o preço para calcular";
+    els.usdNote.innerHTML="";
+    els.rows.innerHTML="";
+    els.btnAdd.style.display="none";
+  }else{
+    var afterD1=p*(1-d1/100);
+    var afterD2=afterD1*(1-d2/100);
+    var taxUsd=afterD2*tax/100;
+    var usdTotal=afterD2+taxUsd;
+
+    usdStrong(els.usdNote,usdTotal,tax);
+
+    var h="";
+    h+=row("Etiqueta",fmtUSD.format(p));
+    if(d1>0)h+=row("Desconto "+fm(d1)+"%","−"+fmtUSD.format(p-afterD1),"neg");
+    if(d2>0)h+=row("Extra "+fm(d2)+"%","−"+fmtUSD.format(afterD1-afterD2),"neg");
+    if(tax>0)h+=row("Sales tax "+fm(tax)+"%","+"+fmtUSD.format(taxUsd));
+    h+=row("Total em dólares",fmtUSD.format(usdTotal),"sub");
+
+    if(rateOk){
+      var brlBase=usdTotal*r;
+      var brl=brlBase*(1+fee/100);
+      els.total.className="";
+      els.total.textContent=fmtBRL.format(brl);
+      h+=row("Câmbio × "+rateStr(r),fmtBRL.format(brlBase));
+      if(fee>0)h+=row("IOF + spread "+fm(fee)+"%","+"+fmtBRL.format(brl-brlBase));
+    }else{
+      els.total.className="dim";
+      els.total.textContent="Defina a cotação do dólar";
+    }
+    els.rows.innerHTML=h;
+    els.btnAdd.style.display="";
+  }
+
+  /* compra */
+  var n=state.items.length;
+  els.purchase.hidden=n===0;
+  if(n>0){
+    els.pCount.textContent=n+(n>1?" itens":" item");
+
+    var itemsHtml="";
+    var subtotal=0;
+    state.items.forEach(function(it,i){
+      var net=netOf(it);
+      subtotal+=net;
+      var sub="";
+      if(it.d1>0||it.d2>0){
+        var parts=[esc(fmtUSD.format(it.price))];
+        if(it.d1>0)parts.push("−"+fm(it.d1)+"%");
+        if(it.d2>0)parts.push("−"+fm(it.d2)+"% extra");
+        sub='<div class="item-sub">'+parts.join(" · ")+"</div>";
+      }
+      itemsHtml+='<div class="item"><div class="item-info"><div class="item-name">'+esc(it.name)+"</div>"+sub+"</div>"+
+        '<span class="item-net">'+esc(fmtUSD.format(net))+"</span>"+
+        '<button class="item-x" data-x="'+i+'" aria-label="Remover '+esc(it.name)+'">&times;</button></div>';
+    });
+    els.pItems.innerHTML=itemsHtml;
+
+    var pTaxUsd=subtotal*tax/100;
+    var pUsdTotal=subtotal+pTaxUsd;
+    usdStrong(els.pUsd,pUsdTotal,tax);
+
+    var ph="";
+    ph+=row("Subtotal",fmtUSD.format(subtotal));
+    if(tax>0)ph+=row("Sales tax "+fm(tax)+"%","+"+fmtUSD.format(pTaxUsd));
+    ph+=row("Total em dólares",fmtUSD.format(pUsdTotal),"sub");
+
+    if(rateOk){
+      var pBrlBase=pUsdTotal*r;
+      var pBrl=pBrlBase*(1+fee/100);
+      els.pTotal.className="";
+      els.pTotal.textContent=fmtBRL.format(pBrl);
+      ph+=row("Câmbio × "+rateStr(r),fmtBRL.format(pBrlBase));
+      if(fee>0)ph+=row("IOF + spread "+fm(fee)+"%","+"+fmtBRL.format(pBrl-pBrlBase));
+    }else{
+      els.pTotal.className="p-dim";
+      els.pTotal.textContent="Defina a cotação do dólar";
+    }
+    els.pRows.innerHTML=ph;
+  }
+}
+
+function addItem(){
+  var p=num(els.price.value);
+  if(!isFinite(p)||p<=0)return;
+  var name=els.itemName.value.trim().slice(0,60);
+  if(!name){name="Item "+state.seq}
+  state.seq++;
+  state.items.push({name:name,price:p,d1:pct(els.d1.value,100),d2:pct(els.d2.value,100)});
+  els.price.value="";
+  els.itemName.value="";
+  persist();render();
+  toast(name+" adicionado — "+state.items.length+(state.items.length>1?" itens":" item"));
+  els.price.focus();
+}
+
+function fetchRate(silent){
+  if(!silent){els.btnRate.disabled=true;els.btnRate.textContent="Buscando…"}
+  var ctrl=("AbortController" in window)?new AbortController():null;
+  var timer=ctrl?setTimeout(function(){ctrl.abort()},8000):null;
+  fetch("https://economia.awesomeapi.com.br/json/last/USD-BRL",ctrl?{signal:ctrl.signal}:{})
+    .then(function(res){if(!res.ok)throw new Error("http");return res.json()})
+    .then(function(j){
+      var q=j&&j.USDBRL;
+      var v=q?parseFloat(q.ask||q.bid):NaN;
+      if(!isFinite(v)||v<=0)throw new Error("data");
+      els.rate.value=rateStr(v);
+      var when=(q.create_date||"").slice(11,16);
+      els.rateHint.textContent="Cotação comercial de agora"+(when?" ("+when+")":"")+". No cartão, o banco converte pela taxa do dia do processamento.";
+      persist();render();
+      if(!silent)toast("Cotação atualizada: "+rateStr(v));
+    })
+    .catch(function(){
+      if(!silent)toast("Sem conexão com a API — digite a cotação manualmente");
+    })
+    .then(function(){
+      if(timer)clearTimeout(timer);
+      els.btnRate.disabled=false;els.btnRate.textContent="Buscar agora";
+    });
+}
+
+/* ---- eventos ---- */
+["rate","d1","d2","tax","iof","spread"].forEach(function(id){
+  els[id].addEventListener("input",function(){persist();render()});
+});
+els.price.addEventListener("input",render);
+els.btnClear.addEventListener("click",function(){els.price.value="";render();els.price.focus()});
+els.modeCard.addEventListener("click",function(){state.mode="card";persist();render()});
+els.modeCash.addEventListener("click",function(){state.mode="cash";persist();render()});
+els.btnConfig.addEventListener("click",function(){openConfig(!els.config.classList.contains("open"))});
+els.chips.addEventListener("click",function(e){
+  var b=e.target.closest("button");if(!b)return;
+  openConfig(true);
+  var t=els[b.getAttribute("data-goto")];
+  if(t){t.focus();t.scrollIntoView({block:"center",behavior:"smooth"})}
+});
+els.btnAdd.addEventListener("click",addItem);
+els.pItems.addEventListener("click",function(e){
+  var b=e.target.closest("button[data-x]");if(!b)return;
+  var it=state.items.splice(+b.getAttribute("data-x"),1)[0];
+  persist();render();
+  if(it)toast("Removido: "+it.name);
+});
+var newArm=null;
+els.btnNew.addEventListener("click",function(){
+  if(newArm){
+    clearTimeout(newArm);newArm=null;
+    state.items=[];state.seq=1;
+    persist();render();
+    els.btnNew.textContent="Nova compra";els.btnNew.classList.remove("arm");
+    toast("Nova compra iniciada");
+    return;
+  }
+  els.btnNew.textContent="Toque de novo para apagar tudo";
+  els.btnNew.classList.add("arm");
+  newArm=setTimeout(function(){
+    newArm=null;
+    els.btnNew.textContent="Nova compra";els.btnNew.classList.remove("arm");
+  },3000);
+});
+els.btnRate.addEventListener("click",function(){fetchRate(false)});
+els.btnReset.addEventListener("click",function(){
+  Object.keys(DEFAULTS).forEach(function(k){if(els[k])els[k].value=DEFAULTS[k]});
+  state.mode="card";
+  persist();render();toast("Padrões restaurados");
+});
+els.total.addEventListener("click",function(){
+  if(els.total.classList.contains("dim"))return;
+  var txt=els.total.textContent;
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(function(){toast("Copiado: "+txt)},function(){});
+  }
+});
+
+/* ---- init ---- */
+els.rate.value=typeof saved.rate==="string"?saved.rate:DEFAULTS.rate;
+els.d1.value=typeof saved.d1==="string"?saved.d1:DEFAULTS.d1;
+els.d2.value=typeof saved.d2==="string"?saved.d2:DEFAULTS.d2;
+els.tax.value=typeof saved.tax==="string"?saved.tax:DEFAULTS.tax;
+els.iof.value=typeof saved.iof==="string"?saved.iof:DEFAULTS.iof;
+els.spread.value=typeof saved.spread==="string"?saved.spread:DEFAULTS.spread;
+render();
+if(!num(els.rate.value)){
+  openConfig(true);
+  fetchRate(true);
+}else{
+  els.price.focus();
+}
+
+if("serviceWorker" in navigator && location.protocol==="https:"){
+  try{navigator.serviceWorker.register("./sw.js")}catch(e){}
+}
+})();
+</script>
+</body>
+</html>
